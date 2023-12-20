@@ -16,8 +16,10 @@ function handleCellClick(e) {
         return;
     }
     cell.textContent = currentPlayer;
-    if (checkWin(currentPlayer)) {
-        alert(`${currentPlayer} wins!`);
+    let winInfo = checkWin(currentPlayer);
+    if (winInfo.isWinner) {
+        drawWinLine(winInfo.combination);
+        setTimeout(() => alert(`${currentPlayer} wins!`), 10);
         gameActive = false;
         return;
     }
@@ -37,19 +39,30 @@ function checkWin(player) {
         [0, 4, 8], [2, 4, 6]              // Diagonals
     ];
 
-    return winPatterns.some(combination => {
-        return combination.every(index => {
-            return cells[index].textContent === player;
-        });
-    });
+    for (let combination of winPatterns) {
+        if (combination.every(index => cells[index].textContent === player)) {
+            return { isWinner: true, combination: combination };
+        }
+    }
+    return { isWinner: false, combination: [] };
 }
 
 function checkDraw() {
     return [...cells].every(cell => cell.textContent !== '');
 }
 
+function drawWinLine(combination) {
+    combination.forEach(index => {
+        cells[index].style.color = 'red'; // Change color to red for winning combination
+    });
+    // Additional styles or line drawing can be added here
+}
+
 function restartGame() {
-    cells.forEach(cell => cell.textContent = '');
+    cells.forEach(cell => {
+        cell.textContent = '';
+        cell.style.color = 'white'; // Reset color back to white
+    });
     currentPlayer = 'X';
     gameActive = true;
 }
